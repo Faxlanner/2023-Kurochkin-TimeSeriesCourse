@@ -132,6 +132,7 @@ class NaiveBestMatchFinder(BestMatchFinder):
         super().__init__(ts, query, exclusion_zone, top_k, normalize, r)
 
 
+
     def perform(self):
         """
         Perform the best match finder using the naive algorithm.
@@ -151,7 +152,18 @@ class NaiveBestMatchFinder(BestMatchFinder):
             excl_zone = int(np.ceil(m / self.excl_zone_denom))
         
         # INSERT YOUR CODE
-
+        if self.normalize:
+          self.query = z_normalize(self.query)
+        distdtw = []
+        for i in range(N):
+          subseq = self.ts_data[i]
+          if self.normalize:
+            subseq = z_normalize(subseq)            
+          dist = DTW_distance(self.query, subseq, self.r)
+          if dist < bsf:
+            bsf = dist
+            distdtw.append(dist)
+        self.bestmatch = self._top_k_match(distdtw, m, bsf, excl_zone)
         return self.bestmatch
 
 
